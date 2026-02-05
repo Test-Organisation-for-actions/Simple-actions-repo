@@ -11,6 +11,9 @@ on:
         required: true
         default: 'v1.97.3'
 
+permissions:
+  contents: write
+
 jobs:
   update-text:
     name: Update text file
