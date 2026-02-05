@@ -36,7 +36,6 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           permission-actions: write
           permission-pull-requests: write
-          permission-workflows: write
           permission-contents: write
           owner: ${{ github.repository_owner }}
           repositories: "Simple-actions-repo"
@@ -83,7 +82,6 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           permission-actions: write
           permission-pull-requests: write
-          permission-workflows: write
           permission-contents: write
           owner: ${{ github.repository_owner }}
           repositories: "Simple-actions-repo"
