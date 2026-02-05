@@ -11,18 +11,31 @@ on:
         required: true
         default: 'v1.97.3'
 
+permissions:
+  contents: write
+
 jobs:
   update-text:
     name: Update text file
     runs-on: ubuntu-latest
+    outputs:
+      token: ${{ steps.generate_token.outputs.token }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_ID_GITHUB }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
       - name: Update text file
         run: |
           echo "Updating text file with KMP tag: ${{ github.event.inputs.kmp_tag }}"
           echo "KMP Tag: ${{ github.event.inputs.kmp_tag }}" > kmp_tag.txt
       - name: Commit and push changes
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
@@ -41,6 +54,8 @@ jobs:
         with:
           ref: update-kmp-tag
       - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ needs.update-text.outputs.token }}
         run: |
           gh pr create --title "Update KMP tag to ${{ github.event.inputs.kmp_tag }}" \
             --body "This PR updates the KMP tag to ${{ github.event.inputs.kmp_tag }} for the ${{ github.event.inputs.platform }} platform." \ 
