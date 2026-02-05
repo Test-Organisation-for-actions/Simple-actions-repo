@@ -55,7 +55,7 @@ jobs:
           ref: update-kmp-tag
       - name: Create Pull Request
         env:
-          GH_TOKEN: ${{ needs.update-text.outputs.token }}
+          GH_TOKEN: "${{ needs.update-text.outputs.token }}"
         run: |
           gh pr create --title "Update KMP tag to ${{ github.event.inputs.kmp_tag }}" \
             --body "This PR updates the KMP tag to ${{ github.event.inputs.kmp_tag }} for the ${{ github.event.inputs.platform }} platform." \ 
