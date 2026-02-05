@@ -39,7 +39,7 @@ jobs:
           permission-workflows: write
           permission-contents: write
           owner: ${{ github.repository_owner }}
-          repositories: "${{ github.repository }}"
+          repositories: "Simple-actions-repo"
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -86,7 +86,7 @@ jobs:
           permission-workflows: write
           permission-contents: write
           owner: ${{ github.repository_owner }}
-          repositories: "${{ github.repository }}"
+          repositories: "Simple-actions-repo"
       - name: Checkout code
         uses: actions/checkout@v4
         with:
