@@ -93,8 +93,6 @@ jobs:
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          gh pr create --title "Update KMP tag to ${{ github.event.inputs.kmp_tag }}" \
-            --body "This PR updates the KMP tag to ${{ github.event.inputs.kmp_tag }} for the ${{ github.event.inputs.platform }} platform." \ 
-            --reviewer ${{ github.actor }} \
-            --assignee ${{ github.actor }} \
+          gh pr create --title "Update KMP tag to ${{ inputs.kmp_tag }}" \
+            --body "This PR updates the KMP tag to ${{ inputs.kmp_tag }} for the ${{ inputs.platform }} platform." \ 
             --draft
