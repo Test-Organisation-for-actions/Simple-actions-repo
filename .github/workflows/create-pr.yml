@@ -1,0 +1,49 @@
+name: Create a PR
+on:
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Target platform for the PR (android or ios)'
+        required: true
+        default: 'android'
+      kmp_tag:
+        description: 'The KMP tag to pull from'
+        required: true
+        default: 'v1.97.3'
+
+jobs:
+  update-text:
+    name: Update text file
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Update text file
+        run: |
+          echo "Updating text file with KMP tag: ${{ github.event.inputs.kmp_tag }}"
+          echo "KMP Tag: ${{ github.event.inputs.kmp_tag }}" > kmp_tag.txt
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add kmp_tag.txt
+          git checkout -b update-kmp-tag
+          git commit -m "Update KMP tag to ${{ github.event.inputs.kmp_tag }}"
+          git push origin update-kmp-tag
+
+  create-pr:
+    name: Create Pull Request
+    needs: update-text
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: update-kmp-tag
+      - name: Create Pull Request
+        run: |
+          gh pr create --title "Update KMP tag to ${{ github.event.inputs.kmp_tag }}" \
+            --body "This PR updates the KMP tag to ${{ github.event.inputs.kmp_tag }} for the ${{ github.event.inputs.platform }} platform." \ 
+            --reviewer ${{ github.actor }} \
+            --assignee ${{ github.actor }} \
+            --draft

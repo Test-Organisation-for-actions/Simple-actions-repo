@@ -1,0 +1,22 @@
+name: Build and Test
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - '**'
+
+  pull_request:
+    paths:
+      - '**'
+
+jobs:
+  build-and-test:
+    name: 'Build'
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build
+        run: echo "Building the project..."
+      - name: Test
+        run: echo "Running tests..."
+
