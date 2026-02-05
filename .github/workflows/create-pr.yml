@@ -65,6 +65,8 @@ jobs:
     needs: update-text
     env:
       TOTO: ${{ needs.update-text.outputs.token }}
+    outputs:
+      pr_url: ${{ steps.create_pr.outputs.pr_url }}
     runs-on: ubuntu-latest
     steps:
       - name: '🕵️‍♂️ Start SSH session for debugging'
@@ -90,9 +92,19 @@ jobs:
         with:
           ref: update-kmp-tag
       - name: Create Pull Request
+        id: create_pr
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
-          gh pr create --title "Update KMP tag to ${{ inputs.kmp_tag }}" \
-            --body "This PR updates the KMP tag to ${{ inputs.kmp_tag }} for the ${{ inputs.platform }} platform." \ 
-            --draft
+          if ${{ inputs.draft }}; then
+            draft="--draft"
+          else
+            draft=""
+          fi
+          pr_url=$(gh pr create --title "Update KMP version ${{ inputs.kmp_tag }}" \
+            --body "Pulls KMP version ${{ inputs.kmp_tag }}" \
+            --reviewer ${{ github.actor }} \
+            --assignee ${{ github.actor }} \
+            "$draft")
+          echo "$pr_url"
+          echo "pr_url=$pr_url" >> $GITHUB_OUTPUT
