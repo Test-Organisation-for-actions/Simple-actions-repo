@@ -1,4 +1,7 @@
 name: Create a PR
+env:
+  RUN_IN_DEBUG: ${{ secrets.ACTIONS_STEP_DEBUG || 'false' }}
+
 on:
   workflow_dispatch:
     inputs:
@@ -49,6 +52,13 @@ jobs:
     needs: update-text
     runs-on: ubuntu-latest
     steps:
+      - name: '🕵️‍♂️ Start SSH session for debugging'
+        if: ${{ env.RUN_IN_DEBUG == 'true' }}
+        uses: mxschmitt/action-tmate@v3
+        with:
+          detached: true
+          limit-access-to-actor: true
+          connect-timeout-seconds: 180
       - name: Checkout code
         uses: actions/checkout@v4
         with:
