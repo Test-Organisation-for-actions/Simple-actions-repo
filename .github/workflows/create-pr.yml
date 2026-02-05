@@ -26,7 +26,7 @@ jobs:
     name: Update text file
     runs-on: ubuntu-latest
     outputs:
-      token: ${{ steps.generate_token.outputs.token }}
+      token: ${{ steps.commit_push.outputs.token }}
     steps:
       - name: Generate a token
         id: generate_token
@@ -34,6 +34,12 @@ jobs:
         with:
           app-id: ${{ vars.APP_ID_GITHUB }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-actions: write
+          permission-pull-requests: write
+          permission-workflows: write
+          permission-contents: write
+          owner: ${{ github.repository_owner }}
+          repositories: "${{ github.repository }}"
       - name: Checkout code
         uses: actions/checkout@v4
         with:
@@ -43,6 +49,7 @@ jobs:
           echo "Updating text file with KMP tag: ${{ github.event.inputs.kmp_tag }}"
           echo "KMP Tag: ${{ github.event.inputs.kmp_tag }}" > kmp_tag.txt
       - name: Commit and push changes
+        id: commit_push
         env:
           GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
@@ -58,7 +65,7 @@ jobs:
     name: Create Pull Request
     needs: update-text
     env:
-      GH_TOKEN: "${{ needs.update-text.outputs.token }}"
+      TOTO: ${{ steps.update-text.outputs.token }}
     runs-on: ubuntu-latest
     steps:
       - name: '🕵️‍♂️ Start SSH session for debugging'
@@ -68,11 +75,25 @@ jobs:
           detached: true
           limit-access-to-actor: true
           connect-timeout-seconds: 180
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.APP_ID_GITHUB }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          permission-actions: write
+          permission-pull-requests: write
+          permission-workflows: write
+          permission-contents: write
+          owner: ${{ github.repository_owner }}
+          repositories: "${{ github.repository }}"
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           ref: update-kmp-tag
       - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
         run: |
           gh pr create --title "Update KMP tag to ${{ github.event.inputs.kmp_tag }}" \
             --body "This PR updates the KMP tag to ${{ github.event.inputs.kmp_tag }} for the ${{ github.event.inputs.platform }} platform." \ 
