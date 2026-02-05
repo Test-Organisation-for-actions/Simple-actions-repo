@@ -28,14 +28,16 @@ jobs:
     outputs:
       token: ${{ steps.generate_token.outputs.token }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
       - name: Generate a token
         id: generate_token
         uses: actions/create-github-app-token@v2
         with:
           app-id: ${{ vars.APP_ID_GITHUB }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: '${{ steps.generate_token.outputs.token }}'
       - name: Update text file
         run: |
           echo "Updating text file with KMP tag: ${{ github.event.inputs.kmp_tag }}"
@@ -50,6 +52,7 @@ jobs:
           git checkout -b update-kmp-tag
           git commit -m "Update KMP tag to ${{ github.event.inputs.kmp_tag }}"
           git push origin update-kmp-tag
+          echo "token=${{ steps.generate_token.outputs.token }}" >> $GITHUB_OUTPUT
 
   create-pr:
     name: Create Pull Request
