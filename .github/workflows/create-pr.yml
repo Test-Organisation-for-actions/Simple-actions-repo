@@ -13,6 +13,11 @@ on:
         description: 'The KMP tag to pull from'
         required: true
         default: 'v1.97.3'
+      draft:
+        description: 'Whether to create the PR as a draft'
+        required: true
+        default: true
+        type: boolean
 
 permissions:
   contents: write
